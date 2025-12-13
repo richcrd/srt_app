@@ -11,18 +11,34 @@ import '../../../home/presentation/pages/home_page.dart';
 import 'register_page.dart';
 import 'forgot_password_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final ValueNotifier<bool> _passwordObscure = ValueNotifier(true);
+  late final AuthBloc _authBloc = sl<AuthBloc>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordObscure.dispose();
+    _authBloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final ValueNotifier<bool> passwordObscure = ValueNotifier(true);
     final size = MediaQuery.of(context).size;
 
-    return BlocProvider(
-      create: (_) => sl<AuthBloc>(),
+    return BlocProvider.value(
+      value: _authBloc,
       child: Scaffold(
         body: Container(
           width: double.infinity,
@@ -128,21 +144,21 @@ class LoginPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 22),
                               AuthInput(
-                                controller: emailController,
+                                controller: _emailController,
                                 hintText: 'Usuario',
                                 icon: Icons.person_outline,
                                 keyboardType: TextInputType.text,
                               ),
                               const SizedBox(height: 10),
                               ValueListenableBuilder<bool>(
-                                valueListenable: passwordObscure,
+                                valueListenable: _passwordObscure,
                                 builder: (context, value, _) => AuthInput(
-                                  controller: passwordController,
+                                  controller: _passwordController,
                                   hintText: 'Contraseña',
                                   icon: Icons.lock_outline,
                                   obscureText: value,
                                   onVisibilityToggle: (v) =>
-                                      passwordObscure.value = v,
+                                      _passwordObscure.value = v,
                                 ),
                               ),
                               const SizedBox(height: 18),
@@ -151,8 +167,8 @@ class LoginPage extends StatelessWidget {
                                 onPressed: () {
                                   context.read<AuthBloc>().add(
                                     LoginRequested(
-                                      emailController.text,
-                                      passwordController.text,
+                                      _emailController.text,
+                                      _passwordController.text,
                                     ),
                                   );
                                 },

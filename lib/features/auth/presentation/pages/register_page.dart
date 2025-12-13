@@ -8,34 +8,56 @@ import '../../domain/usecases/register_params.dart';
 import '../bloc/auth_state.dart';
 import '../../../../core/di/injection.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmController = TextEditingController();
+  final ValueNotifier<bool> _passwordObscure = ValueNotifier(true);
+  final ValueNotifier<bool> _confirmObscure = ValueNotifier(true);
+  late final AuthBloc _authBloc = sl<AuthBloc>();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _surnameController.dispose();
+    _usernameController.dispose();
+    _emailController.dispose();
+    _phoneNumberController.dispose();
+    _passwordController.dispose();
+    _confirmController.dispose();
+    _passwordObscure.dispose();
+    _confirmObscure.dispose();
+    _authBloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final nameController = TextEditingController();
-    final surnameController = TextEditingController();
-    final usernameController = TextEditingController();
-    final emailController = TextEditingController();
-    final phoneNumberController = TextEditingController();
-    final passwordController = TextEditingController();
-    final confirmController = TextEditingController();
-    final ValueNotifier<bool> passwordObscure = ValueNotifier(true);
-    final ValueNotifier<bool> confirmObscure = ValueNotifier(true);
     final size = MediaQuery.of(context).size;
 
-    return BlocProvider(
-      create: (_) => sl<AuthBloc>(),
+    return BlocProvider.value(
+      value: _authBloc,
       child: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            nameController.clear();
-            surnameController.clear();
-            usernameController.clear();
-            emailController.clear();
-            phoneNumberController.clear();
-            passwordController.clear();
-            confirmController.clear();
+            _nameController.clear();
+            _surnameController.clear();
+            _usernameController.clear();
+            _emailController.clear();
+            _phoneNumberController.clear();
+            _passwordController.clear();
+            _confirmController.clear();
             Navigator.of(context).pop();
           }
         },
@@ -84,61 +106,61 @@ class RegisterPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 22),
                           AuthInput(
-                            controller: nameController,
+                            controller: _nameController,
                             hintText: 'Nombre',
                             icon: Icons.person,
                             keyboardType: TextInputType.name,
                           ),
                           const SizedBox(height: 10),
                           AuthInput(
-                            controller: surnameController,
+                            controller: _surnameController,
                             hintText: 'Apellido',
                             icon: Icons.person_outline,
                             keyboardType: TextInputType.name,
                           ),
                           const SizedBox(height: 10),
                           AuthInput(
-                            controller: usernameController,
+                            controller: _usernameController,
                             hintText: 'Usuario',
                             icon: Icons.account_circle_outlined,
                             keyboardType: TextInputType.text,
                           ),
                           const SizedBox(height: 10),
                           AuthInput(
-                            controller: emailController,
+                            controller: _emailController,
                             hintText: 'Correo electrónico',
                             icon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
                           ),
                           const SizedBox(height: 10),
                           AuthInput(
-                            controller: phoneNumberController,
+                            controller: _phoneNumberController,
                             hintText: 'Teléfono',
                             icon: Icons.phone_outlined,
                             keyboardType: TextInputType.phone,
                           ),
                           const SizedBox(height: 10),
                           ValueListenableBuilder<bool>(
-                            valueListenable: passwordObscure,
+                            valueListenable: _passwordObscure,
                             builder: (context, value, _) => AuthInput(
-                              controller: passwordController,
+                              controller: _passwordController,
                               hintText: 'Contraseña',
                               icon: Icons.lock_outline,
                               obscureText: value,
                               onVisibilityToggle: (v) =>
-                                  passwordObscure.value = v,
+                                  _passwordObscure.value = v,
                             ),
                           ),
                           const SizedBox(height: 10),
                           ValueListenableBuilder<bool>(
-                            valueListenable: confirmObscure,
+                            valueListenable: _confirmObscure,
                             builder: (context, value, _) => AuthInput(
-                              controller: confirmController,
+                              controller: _confirmController,
                               hintText: 'Confirmar contraseña',
                               icon: Icons.lock_outline,
                               obscureText: value,
                               onVisibilityToggle: (v) =>
-                                  confirmObscure.value = v,
+                                  _confirmObscure.value = v,
                             ),
                           ),
                           const SizedBox(height: 18),
@@ -150,12 +172,12 @@ class RegisterPage extends StatelessWidget {
                                     context.read<AuthBloc>().add(
                                       RegisterRequested(
                                         RegisterParams(
-                                          name: nameController.text,
-                                          surname: surnameController.text,
-                                          username: usernameController.text,
-                                          email: emailController.text,
-                                          phoneNumber: phoneNumberController.text,
-                                          password: passwordController.text,
+                                          name: _nameController.text,
+                                          surname: _surnameController.text,
+                                          username: _usernameController.text,
+                                          email: _emailController.text,
+                                          phoneNumber: _phoneNumberController.text,
+                                          password: _passwordController.text,
                                         ),
                                       ),
                                     );
